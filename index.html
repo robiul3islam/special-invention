@@ -326,7 +326,42 @@
 
         // এই নতুন saveInvoice ফাংশনটি আগের ফাংশনটিকে রিপ্লেস (Replace) করবে
         function saveInvoice() {
-            // সেভ করার নতুন অনলাইন কোড...
+            // সেভ করার নতুন অনলাইন কোড... <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+
+<script>
+  // আপনার সংগৃহীত কনফিগারেশন
+  const firebaseConfig = {
+    apiKey: "AIzaSyDvydurLyXf5MvkmxxF2AAOeT7DJXfsAZo",
+    authDomain: "bill-547bb.firebaseapp.com",
+    databaseURL: "https://bill-547bb-default-rtdb.firebaseio.com",
+    projectId: "bill-547bb",
+    storageBucket: "bill-547bb.firebasestorage.app",
+    messagingSenderId: "259028728782",
+    appId: "1:259028728782:web:de8abc7d1bdd3fbdb2899f",
+    measurementId: "G-ER90KZD6P8"
+  };
+
+  // Firebase শুরু করা
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+
+  // বিল অনলাইনে সেভ করার ফাংশন
+  function saveInvoice() {
+    const invNo = document.getElementById('inv-no').value;
+    const data = {
+      invNo: invNo,
+      customer: document.getElementById('c-name').value,
+      total: document.getElementById('sub-total').value,
+      date: document.getElementById('inv-date').value
+    };
+
+    // ডাটাবেসে সেভ করা
+    database.ref('invoices/' + invNo.replace('.', '_')).set(data)
+      .then(() => alert("বিলের তথ্য সফলভাবে অনলাইনে সেভ হয়েছে!"))
+      .catch((e) => alert("ত্রুটি: " + e.message));
+  }
+</script>
         }
     </script>
 </body>
