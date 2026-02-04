@@ -7,39 +7,24 @@
     <style>
         :root { --primary: #f28c28; --bg: #fffbf5; --red: #d32f2f; --green: #27ae60; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #e0e0e0; padding: 20px; }
-        
         .top-search-bar { max-width: 850px; margin: 0 auto 15px; background: #333; color: white; padding: 15px; border-radius: 8px; text-align: center; }
         #main-search { width: 60%; padding: 10px; border-radius: 5px; border: none; }
-
         .controls { max-width: 850px; margin: 0 auto 20px; background: white; padding: 15px; border-radius: 8px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-
         .invoice-container { max-width: 800px; margin: auto; background: white; padding: 40px; min-height: 1050px; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.2); box-sizing: border-box; }
-
         .page-break { page-break-before: always; margin-top: 50px; border-top: 2px dashed #ccc; padding-top: 20px; }
-
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         #logo-preview { max-width: 150px; cursor: pointer; border: 1px dashed #ccc; }
-
         table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
         th, td { border: 1px solid var(--primary); padding: 8px; font-size: 14px; }
         th { background: var(--bg); }
-
         input, textarea, select { width: 100%; border: none; outline: none; background: transparent; font-family: inherit; }
         #c-name { font-weight: bold; font-size: 1.1em; }
-
         #seal-container { position: absolute; width: 120px; cursor: move; z-index: 100; top: 800px; left: 600px; user-select: none; }
         #seal-img { width: 100%; opacity: 0.8; }
-
-        .summary-title { font-size: 20px; font-weight: bold; color: var(--primary); margin-bottom: 15px; text-align: center; }
         #search-results { position: absolute; width: 600px; background: white; z-index: 1000; box-shadow: 0 10px 20px rgba(0,0,0,0.3); left: 50%; transform: translateX(-50%); }
         .search-item { padding: 10px; border-bottom: 1px solid #eee; cursor: pointer; color: black; text-align: left; }
-
         button { padding: 8px 15px; cursor: pointer; border: none; border-radius: 4px; color: white; font-weight: bold; }
-        
-        @media print { 
-            .no-print, .top-search-bar, .controls { display: none !important; }
-            .invoice-container { box-shadow: none; width: 100%; padding: 20px; }
-        }
+        @media print { .no-print, .top-search-bar, .controls { display: none !important; } .invoice-container { box-shadow: none; width: 100%; padding: 20px; } }
     </style>
 </head>
 <body>
@@ -53,7 +38,7 @@
         <button onclick="document.getElementById('logo-input').click()" style="background:#555;">Logo</button>
         <button onclick="document.getElementById('seal-input').click()" style="background:#777;">Seal</button>
         <button onclick="addRow()" style="background:var(--green);">+ Item</button>
-        <button onclick="saveInvoice()" style="background:#3498db;">Save Record</button>
+        <button onclick="saveInvoice()" style="background:#3498db;">Save Online</button>
         <button onclick="exportPDF()" style="background:#9b59b6;">Download PDF</button>
         <button onclick="location.reload()" style="background:var(--red);">Reset</button>
         <input type="file" id="logo-input" accept="image/*" style="display:none">
@@ -61,308 +46,140 @@
     </div>
 
     <div class="invoice-container" id="printable-area">
-        <div class="invoice-page">
-            <div class="header">
-                <h1 style="font-size: 40px; margin:0;">INVOICE</h1>
-                <img id="logo-preview" src="https://via.placeholder.com/150x50?text=Logo">
-            </div>
-
-            <div id="seal-container">
-                <img id="seal-img" src="https://via.placeholder.com/120x120?text=Digital+Seal">
-                <div style="font-size: 9px; color: #999; text-align: center;" class="no-print">Drag to Position</div>
-            </div>
-
-            <div style="display: flex; justify-content: space-between; background: var(--bg); padding: 10px; margin-bottom: 20px; border-top: 3px solid var(--primary);">
-                <div><strong>Inv No:</strong> <input type="text" id="inv-no" value="IC-2026-001" style="width:100px;"></div>
-                <div><strong>Status:</strong> 
-                    <select id="bill-status" style="width: 80px; font-weight: bold;">
-                        <option value="Unpaid">Unpaid</option>
-                        <option value="Paid">Paid</option>
-                    </select>
-                </div>
-                <div><strong>Date:</strong> <input type="text" id="inv-date"></div>
-            </div>
-
-            <table>
-                <tr>
-                    <td width="15%"><strong>Company:</strong></td>
-                    <td width="45%"><input type="text" id="c-company" placeholder="Client's Company"></td>
-                    <td width="15%" align="center" rowspan="2"><strong>Prepared by:</strong></td>
-                    <td width="25%" rowspan="2"><input type="text" id="prep-by" value="Inovera Creation" style="text-align:center; font-weight:bold;"></td>
-                </tr>
-                <tr>
-                    <td><strong>Name:</strong></td>
-                    <td><input type="text" id="c-name" placeholder="Client Full Name" oninput="showSummary(this.value)"></td>
-                </tr>
-                <tr>
-                    <td><strong>Address:</strong></td>
-                    <td><input type="text" id="c-address" placeholder="Client Address..."></td>
-                    <td align="center" rowspan="2"><strong>Prepared for:</strong></td>
-                    <td rowspan="2"><input type="text" id="prep-for" style="text-align:center"></td>
-                </tr>
-                <tr>
-                    <td><strong>Contact:</strong></td>
-                    <td><input type="text" id="c-contact" placeholder="Phone Number"></td>
-                </tr>
-            </table>
-
-            <table id="item-table">
-                <thead>
-                    <tr><th width="5%">SL</th><th width="55%">Description</th><th width="10%">Qty</th><th width="15%">Price</th><th width="15%">Total</th></tr>
-                </thead>
-                <tbody id="tbody"></tbody>
-            </table>
-
-            <div style="margin-left: auto; width: 40%;">
-                <table>
-                    <tr><td style="border:none; text-align:right;">Sub Total:</td><td><input type="number" id="sub-total" readonly></td></tr>
-                    <tr><td style="border:none; text-align:right;">Advance:</td><td><input type="number" id="advance" value="0" oninput="calculate()"></td></tr>
-                    <tr style="background:var(--bg);"><td style="border:none; text-align:right;"><strong>Due:</strong></td><td><input type="number" id="due" readonly style="font-weight:bold;"></td></tr>
-                </table>
-            </div>
-            
-            <p><strong>In Words:</strong> <span id="words-area"></span></p>
-            <div style="color:red; font-weight:bold;">* Price Excluding VAT and TAX</div>
+        <div class="header">
+            <h1 style="font-size: 40px; margin:0;">INVOICE</h1>
+            <img id="logo-preview" src="https://via.placeholder.com/150x50?text=Logo">
+        </div>
+        <div id="seal-container">
+            <img id="seal-img" src="https://via.placeholder.com/120x120?text=Digital+Seal">
         </div>
 
-        <div id="summary-page" class="page-break" style="display:none;">
-            <div class="summary-title">Statement of Outstanding Balance</div>
-            <p>Client: <strong id="sum-client-name"></strong></p>
+        <div style="display: flex; justify-content: space-between; background: var(--bg); padding: 10px; margin-bottom: 20px; border-top: 3px solid var(--primary);">
+            <div><strong>Inv No:</strong> <input type="text" id="inv-no" value="IC-2026-001" style="width:100px;"></div>
+            <div><strong>Date:</strong> <input type="text" id="inv-date"></div>
+        </div>
+
+        <table>
+            <tr>
+                <td width="15%"><strong>Company:</strong></td>
+                <td width="45%"><input type="text" id="c-company" placeholder="Client's Company"></td>
+                <td width="15%" align="center"><strong>Prepared by:</strong></td>
+                <td width="25%"><input type="text" id="prep-by" value="Inovera Creation" style="text-align:center; font-weight:bold;"></td>
+            </tr>
+            <tr>
+                <td><strong>Name:</strong></td>
+                <td><input type="text" id="c-name" placeholder="Client Full Name"></td>
+                <td align="center"><strong>Address:</strong></td>
+                <td><input type="text" id="c-address" placeholder="Address"></td>
+            </tr>
+        </table>
+
+        <table id="item-table">
+            <thead>
+                <tr><th width="5%">SL</th><th width="55%">Description</th><th width="10%">Qty</th><th width="15%">Price</th><th width="15%">Total</th></tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+
+        <div style="margin-left: auto; width: 40%;">
             <table>
-                <thead>
-                    <tr>
-                        <th class="no-print" width="5%">Select</th>
-                        <th>Inv No</th>
-                        <th>Date</th>
-                        <th>Total Bill</th>
-                        <th>Advance Paid</th>
-                        <th>Due to Add</th>
-                    </tr>
-                </thead>
-                <tbody id="sum-tbody"></tbody>
+                <tr><td style="border:none; text-align:right;">Sub Total:</td><td><input type="number" id="sub-total" readonly></td></tr>
             </table>
-            <div style="text-align: right; font-weight: bold; font-size: 16px; border-top: 2px solid var(--primary); padding-top: 10px;">
-                Total Selected Due: <span id="total-selected-due">0.00</span> BDT
-            </div>
         </div>
     </div>
-
-    <script>
-        document.getElementById('inv-date').value = new Date().toLocaleDateString('en-GB');
-
-        function addRow(d='', q='', p='', t='') {
-            const tbody = document.getElementById('tbody');
-            const row = tbody.insertRow();
-            row.innerHTML = `
-                <td align="center">${tbody.rows.length}</td>
-                <td><textarea class="item-desc">${d}</textarea></td>
-                <td><input type="number" class="qty" value="${q}" oninput="updateRow(this)"></td>
-                <td><input type="number" class="price" value="${p}" oninput="updateRow(this)"></td>
-                <td><input type="number" class="row-total" value="${t}" readonly></td>
-            `;
-            calculate();
-        }
-
-        function updateRow(el) {
-            const row = el.closest('tr');
-            const q = parseFloat(row.querySelector('.qty').value) || 0;
-            const p = parseFloat(row.querySelector('.price').value) || 0;
-            row.querySelector('.row-total').value = (q * p).toFixed(2);
-            calculate();
-        }
-
-        function calculate() {
-            let total = 0;
-            document.querySelectorAll('.row-total').forEach(i => total += parseFloat(i.value) || 0);
-            const adv = parseFloat(document.getElementById('advance').value) || 0;
-            document.getElementById('sub-total').value = total.toFixed(2);
-            document.getElementById('due').value = (total - adv).toFixed(2);
-            document.getElementById('words-area').innerText = numberToWords(Math.floor(total)) + " Taka Only";
-        }
-
-        function showSummary(name) {
-            if(!name) { document.getElementById('summary-page').style.display='none'; return; }
-            const db = JSON.parse(localStorage.getItem('inv_db') || '[]');
-            const clientBills = db.filter(i => i.name.toLowerCase() === name.toLowerCase());
-            
-            if(clientBills.length > 0) {
-                document.getElementById('summary-page').style.display='block';
-                document.getElementById('sum-client-name').innerText = name;
-                document.getElementById('sum-tbody').innerHTML = clientBills.map(i => {
-                    let due = parseFloat(i.total) - parseFloat(i.adv);
-                    return `
-                    <tr>
-                        <td class="no-print" align="center"><input type="checkbox" class="sum-checkbox" data-due="${due}" onchange="updateSumTotal()" checked></td>
-                        <td>${i.invNo}</td>
-                        <td>${i.date}</td>
-                        <td>${i.total}</td>
-                        <td>${i.adv}</td>
-                        <td style="font-weight:bold; color:red;">${due.toFixed(2)}</td>
-                    </tr>`;
-                }).join('');
-                updateSumTotal();
-            } else {
-                document.getElementById('summary-page').style.display='none';
-            }
-        }
-
-        function updateSumTotal() {
-            let total = 0;
-            document.querySelectorAll('.sum-checkbox:checked').forEach(cb => total += parseFloat(cb.getAttribute('data-due')));
-            document.getElementById('total-selected-due').innerText = total.toFixed(2);
-        }
-
-        const seal = document.getElementById("seal-container");
-        let isDragging = false;
-        seal.onmousedown = (e) => isDragging = true;
-        document.onmousemove = (e) => {
-            if(isDragging) {
-                seal.style.left = (e.pageX - 60) + "px";
-                seal.style.top = (e.pageY - 60) + "px";
-            }
-        };
-        document.onmouseup = () => isDragging = false;
-
-        function saveInvoice() {
-            const db = JSON.parse(localStorage.getItem('inv_db') || '[]');
-            const items = [];
-            document.querySelectorAll('#tbody tr').forEach(r => {
-                items.push({ d: r.querySelector('.item-desc').value, q: r.querySelector('.qty').value, p: r.querySelector('.price').value, t: r.querySelector('.row-total').value });
-            });
-            const data = {
-                invNo: document.getElementById('inv-no').value, 
-                name: document.getElementById('c-name').value,
-                company: document.getElementById('c-company').value,
-                address: document.getElementById('c-address').value,
-                contact: document.getElementById('c-contact').value,
-                prepFor: document.getElementById('prep-for').value,
-                total: document.getElementById('sub-total').value, 
-                adv: document.getElementById('advance').value,
-                date: document.getElementById('inv-date').value, 
-                status: document.getElementById('bill-status').value,
-                items: items, 
-                logo: document.getElementById('logo-preview').src
-            };
-            const idx = db.findIndex(i => i.invNo === data.invNo);
-            if(idx > -1) db[idx] = data; else db.push(data);
-            localStorage.setItem('inv_db', JSON.stringify(db));
-            alert("Data Saved!");
-        }
-
-        function globalSearch() {
-            const q = document.getElementById('main-search').value.toLowerCase();
-            const res = document.getElementById('search-results');
-            if(!q) { res.innerHTML = ""; return; }
-            const db = JSON.parse(localStorage.getItem('inv_db') || '[]');
-            const matches = db.filter(i => i.name.toLowerCase().includes(q) || i.invNo.toLowerCase().includes(q));
-            res.innerHTML = matches.map(m => `<div class="search-item" onclick="loadInv('${m.invNo}')">${m.invNo} - ${m.name}</div>`).join('');
-        }
-
-        function loadInv(no) {
-            const db = JSON.parse(localStorage.getItem('inv_db'));
-            const d = db.find(i => i.invNo === no);
-            document.getElementById('inv-no').value = d.invNo;
-            document.getElementById('c-name').value = d.name;
-            document.getElementById('c-company').value = d.company || '';
-            document.getElementById('c-address').value = d.address || '';
-            document.getElementById('c-contact').value = d.contact || '';
-            document.getElementById('prep-for').value = d.prepFor || '';
-            document.getElementById('advance').value = d.adv;
-            document.getElementById('logo-preview').src = d.logo;
-            const tb = document.getElementById('tbody');
-            tb.innerHTML = "";
-            d.items.forEach(i => addRow(i.d, i.q, i.p, i.t));
-            document.getElementById('search-results').innerHTML = "";
-            showSummary(d.name);
-        }
-
-        function exportPDF() {
-            const element = document.getElementById('printable-area');
-            html2pdf().set({ margin: 0, filename: 'Invoice_Inovera.pdf', image: { type: 'jpeg', quality: 1 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(element).save();
-        }
-
-        document.getElementById('logo-input').onchange = (e) => {
-            const r = new FileReader(); r.onload = () => document.getElementById('logo-preview').src = r.result;
-            r.readAsDataURL(e.target.files[0]);
-        };
-        document.getElementById('seal-input').onchange = (e) => {
-            const r = new FileReader(); r.onload = () => document.getElementById('seal-img').src = r.result;
-            r.readAsDataURL(e.target.files[0]);
-        };
-
-        function numberToWords(num) {
-            const a = ['','one ','two ','three ','four ','five ','six ','seven ','eight ','nine ','ten ','eleven ','twelve ','thirteen ','fourteen ','fifteen ','sixteen ','seventeen ','eighteen ','nineteen '];
-            const b = ['', '', 'twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
-            let n = ('000000000' + Math.floor(num)).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
-            if (!n) return ''; 
-            let str = '';
-            str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'crore ' : '';
-            str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'lakh ' : '';
-            str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'thousand ' : '';
-            str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'hundred ' : '';
-            str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
-            return str;
-        }
-
-        window.onload = () => addRow();
-    </script>
-</body>
-</html> <script>
-        // আপনার আগের জাভাস্ক্রিপ্ট ফাংশনগুলো এখানে আছে
-    </script>
 
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
 
     <script>
+        // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "আপনার_API_KEY",
-            databaseURL: "আপনার_DATABASE_URL",
-            projectId: "আপনার_PROJECT_ID",
-            appId: "আপনার_APP_ID"
+            apiKey: "AIzaSyDvydurLyXf5MvkmxxF2AAOeT7DJXfsAZo",
+            authDomain: "bill-547bb.firebaseapp.com",
+            databaseURL: "https://bill-547bb-default-rtdb.firebaseio.com",
+            projectId: "bill-547bb",
+            appId: "1:259028728782:web:de8abc7d1bdd3fbdb2899f"
         };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        const database = firebase.database();
 
-        // এই নতুন saveInvoice ফাংশনটি আগের ফাংশনটিকে রিপ্লেস (Replace) করবে
+        // 1. Save to Firebase
         function saveInvoice() {
-            // সেভ করার নতুন অনলাইন কোড... <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+            const invNo = document.getElementById('inv-no').value;
+            const data = {
+                invNo: invNo,
+                customer: document.getElementById('c-name').value,
+                company: document.getElementById('c-company').value,
+                total: document.getElementById('sub-total').value,
+                date: document.getElementById('inv-date').value
+            };
 
-<script>
-  // আপনার সংগৃহীত কনফিগারেশন
-  const firebaseConfig = {
-    apiKey: "AIzaSyDvydurLyXf5MvkmxxF2AAOeT7DJXfsAZo",
-    authDomain: "bill-547bb.firebaseapp.com",
-    databaseURL: "https://bill-547bb-default-rtdb.firebaseio.com",
-    projectId: "bill-547bb",
-    storageBucket: "bill-547bb.firebasestorage.app",
-    messagingSenderId: "259028728782",
-    appId: "1:259028728782:web:de8abc7d1bdd3fbdb2899f",
-    measurementId: "G-ER90KZD6P8"
-  };
-
-  // Firebase শুরু করা
-  firebase.initializeApp(firebaseConfig);
-  const database = firebase.database();
-
-  // বিল অনলাইনে সেভ করার ফাংশন
-  function saveInvoice() {
-    const invNo = document.getElementById('inv-no').value;
-    const data = {
-      invNo: invNo,
-      customer: document.getElementById('c-name').value,
-      total: document.getElementById('sub-total').value,
-      date: document.getElementById('inv-date').value
-    };
-
-    // ডাটাবেসে সেভ করা
-    database.ref('invoices/' + invNo.replace('.', '_')).set(data)
-      .then(() => alert("বিলের তথ্য সফলভাবে অনলাইনে সেভ হয়েছে!"))
-      .catch((e) => alert("ত্রুটি: " + e.message));
-  }
-</script>
+            database.ref('invoices/' + invNo.replace('.', '_')).set(data)
+                .then(() => alert("অনলাইনে সেভ হয়েছে!"))
+                .catch((e) => alert("ভুল: " + e.message));
         }
+
+        // 2. Global Search from Firebase
+        function globalSearch() {
+            const q = document.getElementById('main-search').value.toLowerCase();
+            const res = document.getElementById('search-results');
+            if (!q) { res.innerHTML = ""; return; }
+
+            database.ref('invoices').once('value').then((snapshot) => {
+                const dbData = snapshot.val();
+                let html = "";
+                for (let id in dbData) {
+                    const bill = dbData[id];
+                    if (bill.invNo.toLowerCase().includes(q) || bill.customer.toLowerCase().includes(q)) {
+                        html += `<div class="search-item" onclick="loadInv('${id}')">${bill.invNo} - ${bill.customer}</div>`;
+                    }
+                }
+                res.innerHTML = html;
+            });
+        }
+
+        // 3. Load from Firebase
+        function loadInv(id) {
+            database.ref('invoices/' + id).once('value').then((snapshot) => {
+                const d = snapshot.val();
+                if (d) {
+                    document.getElementById('inv-no').value = d.invNo;
+                    document.getElementById('c-name').value = d.customer;
+                    document.getElementById('c-company').value = d.company || '';
+                    document.getElementById('sub-total').value = d.total;
+                    document.getElementById('inv-date').value = d.date;
+                    document.getElementById('search-results').innerHTML = "";
+                }
+            });
+        }
+
+        // Common Functions
+        function addRow() {
+            const tbody = document.getElementById('tbody');
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td align="center">${tbody.rows.length}</td>
+                <td><textarea oninput="calculate()"></textarea></td>
+                <td><input type="number" class="qty" value="1" oninput="calculate()"></td>
+                <td><input type="number" class="price" value="0" oninput="calculate()"></td>
+                <td><input type="number" class="row-total" readonly></td>
+            `;
+        }
+
+        function calculate() {
+            let subTotal = 0;
+            document.querySelectorAll('#tbody tr').forEach(row => {
+                const q = row.querySelector('.qty').value || 0;
+                const p = row.querySelector('.price').value || 0;
+                const total = q * p;
+                row.querySelector('.row-total').value = total.toFixed(2);
+                subTotal += total;
+            });
+            document.getElementById('sub-total').value = subTotal.toFixed(2);
+        }
+
+        document.getElementById('inv-date').value = new Date().toLocaleDateString('en-GB');
+        window.onload = addRow;
     </script>
 </body>
 </html>
